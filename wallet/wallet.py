@@ -49,5 +49,11 @@ class Machine(Wallet):
             print("INVALID!")
         else:
             print("INSUFFICIENT!")
+<<<<<<< HEAD
             #parsa code
             
+=======
+
+        #shayan is here
+        
+>>>>>>> 85b35f9a5738eb9c1559da1518b82cba9f047c4a
