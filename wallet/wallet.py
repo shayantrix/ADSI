@@ -49,3 +49,6 @@ class Machine(Wallet):
             print("INVALID!")
         else:
             print("INSUFFICIENT!")
+
+        #shayan is here
+        
