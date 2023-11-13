@@ -49,8 +49,5 @@ class Machine(Wallet):
             print("INVALID!")
         else:
             print("INSUFFICIENT!")
-
         #shayan is here
         #shayan is good
-        #parsa is good
-        
