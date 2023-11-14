@@ -95,4 +95,3 @@ class Machine(Wallet):
         #shayan is here
         #shayan is good
         #parsa is here too
-        #parsa Email:parsatak2000@yahoo.com
