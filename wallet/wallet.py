@@ -92,6 +92,5 @@ class Machine(Wallet):
             print("INVALID!")
         else:
             print("INSUFFICIENT!")
-        #shayan is here
-        #shayan is good
-        #parsa is here too
+
+# parsa its the time bitch
