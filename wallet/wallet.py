@@ -94,3 +94,4 @@ class Machine(Wallet):
             print("INSUFFICIENT!")
 
 # parsa its the time bitch
+# parsa and tracy pls use comments for hard parts to understand
