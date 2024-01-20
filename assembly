@@ -1,16 +1,15 @@
-https://smartbrains6.com/program-to-find-square-root-in-assembly-language/
 ;Simple_Calculator
 ;Tracy_Shamirian
 ;Shayan_Amirshahkarami
 .model small
 .stack 100h
 .data
-msg    db   'Please choose intended operation:',0dh,0ah,'1.Add',0dh,0ah,'2.Multiply',0dh,0ah,'3.Subtract',0dh,0ah,'4.Divide', 0dh,0ah, '$'
-msg2   db   0dh,0ah,'Enter First Num: $'
-msg3   db   0dh,0ah,'Enter Second Num: $'
-msg4   db   0dh,0ah,'Invalid Input $' 
-msg5   db   0dh,0ah,'The Result is :  $' 
-msg6   db   0dh,0ah,'Thank you for using our simple calculator:) Press any key to exit... ', 0dh,0ah, '$'
+msg db   'Please choose intended operation:',0dh,0ah,'1.Add',0dh,0ah,'2.Multiply',0dh,0ah,'3.Subtract',0dh,0ah,'4.Divide', 0dh,0ah,'5.Square',0dh,0ah,'6.Square Root' ,0dh,0ah, '$'
+msg2 db   0dh,0ah,'Enter First Num: $'
+msg3 db   0dh,0ah,'Enter Second Num: $'
+msg4 db   0dh,0ah,'Invalid Input $' 
+msg5 db   0dh,0ah,'The Result is :  $' 
+msg6 db   0dh,0ah,'Thank you for using our simple calculator:) Press any key to exit... ', 0dh,0ah, '$'
 .code
 ;------------------------------------------
 main proc far
@@ -31,6 +30,10 @@ Start:      mov ah,09h
             je SubtractP
             cmp al,34h           ; 4-divide
             je DivideP
+            cmp al,35h           ; 5-square
+            je SquareP
+            cmp al,36h           ; 6-square root
+            je Square_RootP
             mov ah,09h
             mov dx,offset msg4   ;if the user input is out of range we prompt an invalid input error msg
             int 21h
@@ -48,8 +51,15 @@ MultiplyP:
             jmp exit
 DivideP:
             call Divide
-            jmp exit           
-           
+            jmp exit 
+SquareP:            
+            call Square
+            jmp exit
+Square_RootP:            
+            call Square_Root
+            jmp exit            
+            
+            
 exit:       mov dx,offset msg6
             mov ah,09h
             int 21h  
@@ -169,7 +179,55 @@ Subtract proc
             call View 
             ret
 Subtract endp  
-;------------------------------------------          
+;------------------------------------------
+Square proc
+            mov ah,09h
+            mov dx,offset msg2
+            int 21h
+            mov cx,0
+            mov ax,0
+            call Input_Num
+            mov ax,dx
+            mul ax             ;ax=ax*ax        
+            mov dx,ax          ;the result is in ax 
+            push dx  
+            mov ah,09h
+            mov dx,offset msg5
+            int 21h
+            mov cx,10000
+            pop dx
+            call View
+            ret
+Square endp
+;------------------------------------------  
+Square_Root proc
+            mov ah,09h
+            mov dx,offset msg2
+            int 21h
+            mov cx,0
+            call Input_Num ;the number is in dx
+            mov bx,dx
+            mov ax,0
+            mov cx,0
+sqrb:       inc cx
+            mov ax,cx
+            mul ax
+            cmp ax,bx
+            jb sqrb
+            cmp ax,bx
+            je sqre
+            dec cx
+sqre:       mov dx,cx
+            push dx  
+            mov ah,09h
+            mov dx,offset msg5
+            int 21h
+            mov cx,10000
+            pop dx
+            call View
+            ret
+Square_Root endp
+;------------------------------------------        
 Input_Num proc
             mov ah,0
             int 16h     ;we use interrupt 16h to read a key press     
