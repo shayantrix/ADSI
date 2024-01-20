@@ -4,7 +4,7 @@
 msg    db      'Please choose intended operation',0dh,0ah,'1-Add',0dh,0ah,'2-Multiply',0dh,0ah,'3-Subtract',0dh,0ah,'4-Divide', 0dh,0ah, '$'
 msg2   db      0dh,0ah,'Enter First No: $'
 msg3   db      0dh,0ah,'Enter Second No: $'
-msg4   db      0dh,0ah,'Choice Error $' 
+msg4   db      0dh,0ah,'Invalid input $' 
 msg5   db      0dh,0ah,'Result : $' 
 msg6   db      0dh,0ah ,'thank you for using the simple calculator! press any key to exit... ', 0dh,0ah, '$'
 .code
