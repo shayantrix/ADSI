@@ -1,36 +1,41 @@
+;Simple_Calculator
+;Tracy_Shamirian
+;Shayan_Amirshahkarami
 .model small
 .stack 100h
 .data
-msg    db      'Please choose intended operation',0dh,0ah,'1-Add',0dh,0ah,'2-Multiply',0dh,0ah,'3-Subtract',0dh,0ah,'4-Divide', 0dh,0ah, '$'
-msg2   db      0dh,0ah,'Enter First No: $'
-msg3   db      0dh,0ah,'Enter Second No: $'
-msg4   db      0dh,0ah,'Invalid input $' 
-msg5   db      0dh,0ah,'Result : $' 
-msg6   db      0dh,0ah ,'thank you for using the simple calculator! press any key to exit... ', 0dh,0ah, '$'
+msg    db   'Please choose intended operation:',0dh,0ah,'1.Add',0dh,0ah,'2.Multiply',0dh,0ah,'3.Subtract',0dh,0ah,'4.Divide', 0dh,0ah, '$'
+msg2   db   0dh,0ah,'Enter First Num: $'
+msg3   db   0dh,0ah,'Enter Second Num: $'
+msg4   db   0dh,0ah,'Invalid Input $' 
+msg5   db   0dh,0ah,'The Result is :  $' 
+msg6   db   0dh,0ah,'Thank you for using our simple calculator:) Press any key to exit... ', 0dh,0ah, '$'
 .code
-main proc far
-mov ax,@data
-mov ds,ax
 ;------------------------------------------
-Start:      mov ah,9
-            mov dx, offset msg ;first we will display hte first message from which he can choose the operation using int 21h
+main proc far
+            mov ax,@data
+            mov ds,ax
+
+Start:      mov ah,09h
+            mov dx,offset msg   ;first we'll display the first message from which the user can choose the operation 
             int 21h
+            
             mov ah,0                       
-            int 16h  ;then we will use int 16h to read a key press, to know the operation he choosed
-            cmp al,31h ;the keypress will be stored in al so, we will comapre to 1 addition ..........
+            int 16h              ;then we will use interrupt 16h to read a key press, to know the operation user choosed
+            cmp al,31h           ;the keypress will be stored in al reg so, we will comapre it to 1(31h) if it's equal its addition 
             je AdditionP
-            cmp al,32h
+            cmp al,32h           ; 2-multiply 
             je MultiplyP
-            cmp al,33h
+            cmp al,33h           ; 3-subtract 
             je SubtractP
-            cmp al,34h
+            cmp al,34h           ; 4-divide
             je DivideP
             mov ah,09h
-            mov dx, offset msg4
+            mov dx,offset msg4   ;if the user input is out of range we prompt an invalid input error msg
             int 21h
             mov ah,0
             int 16h
-            jmp start
+            jmp Start            ;we jumpt to start again so the user can choose a valid operation
 AdditionP:
             call Addition 
             jmp exit    
@@ -45,7 +50,7 @@ DivideP:
             jmp exit           
            
 exit:       mov dx,offset msg6
-            mov ah, 9
+            mov ah,09h
             int 21h  
 
             mov ah, 0
@@ -53,72 +58,70 @@ exit:       mov dx,offset msg6
             
             mov ax,4c00h
             int 21h
-
-;------------------------------------------
-
 main endp
+;------------------------------------------
 Addition proc
-            mov ah,9  ;then let us handle the case of addition operation
-            mov dx, offset msg2  ;first we will display this message enter first no also using int 21h
+            mov ah,09h  
+            mov dx,offset msg2    ;we will prompt the user to enter the first operand
             int 21h
-            mov cx,0 ;we will call InputNo to handle our input as we will take each number seprately
-            call InputNo  ;first we will move to cx 0 because we will increment on it later in InputNo
-            push dx
-            mov ah,9
-            mov dx, offset msg3
+            mov cx,0              ;we reset cx to increment on it later in Input_Num
+            call Input_Num        ;we will call Input_Num procedure to handle our input, it'll take each number seprately
+            push dx          
+            mov ah,09h
+            mov dx,offset msg3    ;we will prompt the user to enter the second operand
             int 21h 
             mov cx,0
-            call InputNo
+            call Input_Num
             pop bx
-            add dx,bx
+            add dx,bx             ;addition operation using stack
             push dx 
-            mov ah,9
-            mov dx, offset msg5
+            mov ah,09h
+            mov dx,offset msg5    ;we display the result
             int 21h
             mov cx,10000
             pop dx
             call View 
-            
             ret
-Addition endp            
+Addition endp  
+;------------------------------------------          
 Multiply proc
-            mov ah,9
-            mov dx, offset msg2
+            mov ah,09h
+            mov dx,offset msg2
             int 21h
             mov cx,0
-            call InputNo
+            call Input_Num
             push dx
-            mov ah,9
-            mov dx, offset msg3
+            mov ah,09h
+            mov dx,offset msg3
             int 21h 
             mov cx,0
-            call InputNo
+            call Input_Num
             pop bx
             mov ax,dx
             mul bx 
             mov dx,ax
             push dx 
-            mov ah,9
-            mov dx, offset msg5
+            mov ah,09h
+            mov dx,offset msg5
             int 21h
             mov cx,10000
             pop dx
             call View 
-             
             ret
-Multiply endp            
+Multiply endp 
+;------------------------------------------           
 Divide proc
-            mov ah,9
-            mov dx, offset msg2
+            mov ah,09h
+            mov dx,offset msg2
             int 21h
             mov cx,0
-            call InputNo
+            call Input_Num
             push dx
-            mov ah,9
-            mov dx, offset msg3
+            mov ah,09h
+            mov dx,offset msg3
             int 21h 
             mov cx,0
-            call InputNo
+            call Input_Num
             pop bx
             mov ax,bx
             mov cx,dx
@@ -129,8 +132,8 @@ Divide proc
             mov dx,ax
             push bx 
             push dx 
-            mov ah,9
-            mov dx, offset msg5
+            mov ah,09h
+            mov dx,offset msg5
             int 21h
             mov cx,10000
             pop dx
@@ -138,69 +141,71 @@ Divide proc
             pop bx
             ;cmp bx,0
             ;je exit 
-             
             ret
-Divide endp            
+Divide endp     
+;------------------------------------------       
 Subtract proc
-            mov ah,9
-            mov dx, offset msg2
+            mov ah,09h
+            mov dx,offset msg2
             int 21h
             mov cx,0
-            call InputNo
+            call Input_Num
             push dx
-            mov ah,9
-            mov dx, offset msg3
+            mov ah,09h
+            mov dx,offset msg3
             int 21h 
             mov cx,0
-            call InputNo
+            call Input_Num
             pop bx
             sub bx,dx
             mov dx,bx
             push dx 
-            mov ah,9
-            mov dx, offset msg5
+            mov ah,09h
+            mov dx,offset msg5
             int 21h
             mov cx,10000
             pop dx
             call View 
-           
             ret
-Subtract endp            
-InputNo proc
+Subtract endp  
+;------------------------------------------          
+Input_Num proc
             mov ah,0
-            int 16h ;then we will use int 16h to read a key press     
+            int 16h     ;we use interrupt 16h to read a key press     
             mov dx,0  
             mov bx,1 
-            cmp al,0dh ;the keypress will be stored in al so, we will comapre to  0d which represent the enter key, to know wheter he finished entering the number or not 
-            je FormNo ;if it's the enter key then this mean we already have our number stored in the stack, so we will return it back using FormNo
-            sub ax,30h ;we will subtract 30 from the the value of ax to convert the value of key press from ascii to decimal
-            call ViewNo ;then call ViewNo to view the key we pressed on the screen
-            mov ah,0 ;we will mov 0 to ah before we push ax to the stack bec we only need the value in al
-            push ax  ;push the contents of ax to the stack
-            inc cx   ;we will add 1 to cx as this represent the counter for the number of digit
-            jmp InputNo ;then we will jump back to input number to either take another number or press enter          
+            cmp al,0dh  ;the keypress will be stored in al so, we will comapre it to 0dh which represents the enter key, to know wheter user finished entering the number or not 
+            je Form_Num ;if it's the enter key then this means we already have our number fully stored in the stack, so we will return it back using Form_Num proc
+            sub ax,30h  ;we will subtract 30 from the the value of ax to convert the value of key press from ascii to decimal
+            call View_Num ;then we call View_Num to view the key pressed on the screen
+            mov ah,0      ;we will mov 0 to ah before we push ax to the stack bc we only need the value in al
+            push ax       ;push the contents of ax to the stack
+            inc cx        ;we will add 1 to cx as this counter represents the number of digits
+            jmp Input_Num ;then we will jump back to input another digit or press enter          
             ret
-InputNo endp           
-;we took each number separatly so we need to form our number and store in one bit for example if our number 235
-FormNo proc
-            pop ax; Take the last input from the stack  
+Input_Num endp      
+;------------------------------------------     
+;we took each digit separatly so we need to form our number and store it in one place
+Form_Num proc
+            pop ax      ;pop the last input from the stack  
             push dx      
-            mul bx;Here we are multiplying the value of ax with the value of bx
-            pop dx;After multiplication we will remove it from stack
-            add dx,ax;After removing from stack add the value of dx with the value of ax
-            mov ax,bx;Then set the value of bx in ax       
+            mul bx      ;ax=ax*bx
+            pop dx      ;After multiplication we remove it from stack
+            add dx,ax
+            mov ax,bx      
             mov bx,10
-            push dx;push the dx value again in stack before multiplying to resist any kind of accidental effect
-            mul bx;Multiply bx value by 10
-            pop dx;pop the dx after multiplying
-            mov bx,ax;Result of the multiplication is still stored in ax so we need to move it in bx
-            dec cx;After moving the value we will decrement the digit counter value
-            cmp cx,0;Check if the cx counter is 0
-            jne FormNo;If the cx counter is not 0 that means we have multiple digit input and we need to run format number function again
+            push dx     ;push the dx value again in stack before multiplying to resist any kind of accidental effect
+            mul bx      ;Multiply bx value by 10
+            pop dx
+            mov bx,ax   ;Result of the multiplication is still stored in ax so we need to move it in bx
+            dec cx      ;After moving the value we will decrement the digit counter value
+            cmp cx,0    ;Check if the cx counter is 0
+            jne Form_Num;If the cx counter is not 0 that means we have multiple digit input and we need to run format number function again
             ret;If the cx counter is 0 that means all of our digits are fully formatted and stored in bx we just need to return the function   
-FormNo endp
-ViewNo proc
-            push ax ;we will push ax and dx to the stack because we will change there values while viewing then we will pop them back from
+Form_Num endp
+;------------------------------------------
+View_Num proc
+            push ax ;we will push ax and dx to the stack because we will change their values while viewing then we will pop them back from
             push dx ;the stack we will do these so, we don't affect their contents
             mov dx,ax ;we will mov the value to dx as interrupt 21h expect that the output is stored in it
             add dl,30h ;add 30 to its value to convert it back to ascii
@@ -210,12 +215,13 @@ ViewNo proc
             pop ax
             ret      
             
-ViewNo endp       
+View_Num endp  
+;------------------------------------------     
 View proc  
             mov ax,dx
             mov dx,0
             div cx 
-            call ViewNo
+            call View_Num
             mov bx,dx 
             mov dx,0
             mov ax,cx 
@@ -227,4 +233,5 @@ View proc
             jne View
             ret            
 View endp
+;------------------------------------------
 end main
