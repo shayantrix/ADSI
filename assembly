@@ -4,7 +4,7 @@
 .model small
 .stack 100h
 .data
-msg db   'Please choose intended operation:',0dh,0ah,'1.Add',0dh,0ah,'2.Multiply',0dh,0ah,'3.Subtract',0dh,0ah,'4.Divide', 0dh,0ah,'5.Square',0dh,0ah,'6.Square Root' ,0dh,0ah, '$'
+msg db 'Please choose intended operation:',0dh,0ah,'1.Add',0dh,0ah,'2.Multiply',0dh,0ah,'3.Subtract',0dh,0ah,'4.Divide', 0dh,0ah,'5.Square',0dh,0ah,'6.Square Root' ,0dh,0ah, '$'
 msg2 db   0dh,0ah,'Enter First Num: $'
 msg3 db   0dh,0ah,'Enter Second Num: $'
 msg4 db   0dh,0ah,'Invalid Input $' 
@@ -58,8 +58,7 @@ SquareP:
 Square_RootP:            
             call Square_Root
             jmp exit            
-            
-            
+                       
 exit:       mov dx,offset msg6
             mov ah,09h
             int 21h  
@@ -76,41 +75,41 @@ Addition proc
             mov dx,offset msg2    ;we will prompt the user to enter the first operand
             int 21h
             mov cx,0              ;we reset cx to increment on it later in Input_Num
-            call Input_Num        ;we will call Input_Num procedure to handle our input, it'll take each number seprately
-            push dx          
+            call Input_Num ;we will call Input_Num procedure to handle our first input(it'll take each digit seprately and then form the number using stack)
+            push dx        ;the first number is in dx we push it into the stack  
             mov ah,09h
             mov dx,offset msg3    ;we will prompt the user to enter the second operand
             int 21h 
             mov cx,0
-            call Input_Num
-            pop bx
-            add dx,bx             ;addition operation using stack
-            push dx 
+            call Input_Num        ;we will call Input_Num procedure to handle our second input it'll be stored in dx
+            pop bx                ;then we'll pop the first number from the stack to do the addition
+            add dx,bx             ;we add two numbers using add instruction
+            push dx               ;the result of addition will be in dx,we push it to the stack to resist any kind of accidental effect
             mov ah,09h
-            mov dx,offset msg5    ;we display the result
+            mov dx,offset msg5    ;then we display "the result is: 
             int 21h
             mov cx,10000
             pop dx
-            call View 
+            call View             ;we use view proc to display the final result of the operation
             ret
 Addition endp  
 ;------------------------------------------          
 Multiply proc
             mov ah,09h
-            mov dx,offset msg2
+            mov dx,offset msg2   ;we will prompt the user to enter the first operand
             int 21h
-            mov cx,0
-            call Input_Num
-            push dx
+            mov cx,0             ;we reset cx to increment on it later in Input_Num
+            call Input_Num       ;we will call Input_Num procedure to handle our first input
+            push dx              ;the first number is in dx we push it into the stack  
             mov ah,09h
-            mov dx,offset msg3
+            mov dx,offset msg3   ;we will prompt the user to enter the second operand
             int 21h 
             mov cx,0
-            call Input_Num
-            pop bx
-            mov ax,dx
-            mul bx 
-            mov dx,ax
+            call Input_Num       ;we will call Input_Num procedure to handle our second input it'll be stored in dx
+            pop bx               ;then we'll pop the first number from the stack to do the operation
+            mov ax,dx            ;we'll move the second number to ax ,to perform the multiplication  
+            mul bx               ;ax=ax*bx
+            mov dx,ax            ;we store the result in dx then push it to stack to resist any kind of accidental effect
             push dx 
             mov ah,09h
             mov dx,offset msg5
@@ -134,12 +133,12 @@ Divide proc
             mov cx,0
             call Input_Num
             pop bx
-            mov ax,bx
-            mov cx,dx
-            mov dx,0
+            mov ax,bx      ;we store the first num in ax
+            mov cx,dx      ;and the second num in cx
+            mov dx,0       ;so we can reset dx and bx registers to perform the division
             mov bx,0
-            div cx
-            mov bx,dx
+            div cx         
+            mov bx,dx       
             mov dx,ax
             push bx 
             push dx 
@@ -150,14 +149,12 @@ Divide proc
             pop dx
             call View
             pop bx
-            ;cmp bx,0
-            ;je exit 
             ret
 Divide endp     
 ;------------------------------------------       
 Subtract proc
             mov ah,09h
-            mov dx,offset msg2
+            mov dx,offset msg2      
             int 21h
             mov cx,0
             call Input_Num
@@ -167,9 +164,9 @@ Subtract proc
             int 21h 
             mov cx,0
             call Input_Num
-            pop bx
-            sub bx,dx
-            mov dx,bx
+            pop bx          ;we'll pop the first number from the stack to do the operation
+            sub bx,dx       ;the second num is stored in dx , we perform the subtraction bx=bx-dx
+            mov dx,bx       ;we move the result of the subtraction into dx ,then push it to the stack
             push dx 
             mov ah,09h
             mov dx,offset msg5
@@ -188,8 +185,8 @@ Square proc
             mov ax,0
             call Input_Num
             mov ax,dx
-            mul ax             ;ax=ax*ax        
-            mov dx,ax          ;the result is in ax 
+            mul ax          ;ax=ax*ax        
+            mov dx,ax       ;the result is in ax we store it in dx to push it to the stack
             push dx  
             mov ah,09h
             mov dx,offset msg5
@@ -202,21 +199,21 @@ Square endp
 ;------------------------------------------  
 Square_Root proc
             mov ah,09h
-            mov dx,offset msg2
+            mov dx,offset msg2 
             int 21h
             mov cx,0
             call Input_Num ;the number is in dx
-            mov bx,dx
+            mov bx,dx      ;we store the given number in bx
             mov ax,0
             mov cx,0
-sqrb:       inc cx
+sqrb:       inc cx         ;we use cx as a counter for this loop
             mov ax,cx
-            mul ax
-            cmp ax,bx
-            jb sqrb
-            cmp ax,bx
-            je sqre
-            dec cx
+            mul ax         ;on each iteration of the loop we multiply the value of loop counter(cx) by itself to find its square(cx^2)
+            cmp ax,bx      ;then we compare it with the given number , to find the closest value
+            jb sqrb 
+            cmp ax,bx      ;if(cx^2<bx)jmp to the beginning of the loop; else if(cx^2>bx) return cx-1;else if(cx^2==bx) return cx;
+            je sqre        ;if the numbers are equal we've found our answer (cx)
+            dec cx         ;else if cx^2 is greater than the given number we decrease cx 
 sqre:       mov dx,cx
             push dx  
             mov ah,09h
@@ -265,9 +262,9 @@ Form_Num endp
 ;------------------------------------------
 View_Num proc
             push ax ;we will push ax and dx to the stack because we will change their values while viewing then we will pop them back from
-            push dx ;the stack we will do these so, we don't affect their contents
-            mov dx,ax ;we will mov the value to dx as interrupt 21h expect that the output is stored in it
-            add dl,30h ;add 30 to its value to convert it back to ascii
+            push dx      ;the stack we will do these so, we don't affect their contents
+            mov dx,ax    ;we will mov the value to dx as interrupt 21h expect that the output is stored in it
+            add dl,30h   ;add 30 to its value to convert it back to ascii
             mov ah,2
             int 21h
             pop dx  
